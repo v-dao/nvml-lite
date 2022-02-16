@@ -5,7 +5,7 @@
 #include <functional>
 #include <Windows.h>
 
-#include "nvml-lite.h"
+#include "../nvml-lite.h"
 
 class Defer
 {
@@ -14,7 +14,6 @@ public:
     inline Defer(std::function<void()> func) :_function(func) {}
     inline ~Defer() { if (_function) { _function(); } }
 };
-
 
 
 int main()
@@ -104,22 +103,45 @@ int main()
             printf("TEMPERATURE_GPU: %d ℃\n", temperature);
         }
 
-        for (;;)
+        nvmlUtilization_t utilization;
+        ret = nvmlDeviceGetUtilizationRates(device, &utilization);
+        if (ret != NVML_SUCCESS)
         {
-            nvmlUtilization_t utilization;
-            ret = nvmlDeviceGetUtilizationRates(device, &utilization);
-            if (ret != NVML_SUCCESS)
-            {
-                printf("device %i nvmlDeviceGetUtilizationRates Failed: %s\n", i, nvmlErrorString(ret));
-            }
-            else 
-            {
-                printf("----- UtilizationRates -----\n");
-                printf("GPU usage: %d %%\n", utilization.gpu);
-                printf("MEM usage: %d %%\n", utilization.memory);
-            }
+            printf("device %i nvmlDeviceGetUtilizationRates Failed: %s\n", i, nvmlErrorString(ret));
+        }
+        else 
+        {
+            printf("----- UtilizationRates -----\n");
+            printf("GPU usage: %d %%\n", utilization.gpu);
+            printf("MEM usage: %d %%\n", utilization.memory);
+        }
+        
+        nvmlMemory_t fb_meminfo;
+        ret = nvmlDeviceGetMemoryInfo(device, &fb_meminfo);
+        if (ret != NVML_SUCCESS)
+        {
+            printf("device %i nvmlDeviceGetMemoryInfo Failed: %s\n", i, nvmlErrorString(ret));
+        }
+        else 
+        {
+            printf("----- GPU memory -----\n");
+            printf("FB total: %lld MB\n", fb_meminfo.total);
+            printf("FB free : %lld \n", fb_meminfo.free);
+            printf("FB used : %lld \n", fb_meminfo.used);
+        }
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        nvmlBAR1Memory_t bar1_meminfo;
+        ret = nvmlDeviceGetBAR1MemoryInfo(device, &bar1_meminfo);
+        if (ret != NVML_SUCCESS)
+        {
+            printf("device %i nvmlDeviceGetBAR1MemoryInfo Failed: %s\n", i, nvmlErrorString(ret));
+        }
+        else
+        {
+            printf("----- GPU memory -----\n");
+            printf("BAR1 total: %lld MB\n", bar1_meminfo.total);
+            printf("BAR1 free : %lld \n", bar1_meminfo.free);
+            printf("BAR1 used : %lld \n", bar1_meminfo.used);
         }
     }
 

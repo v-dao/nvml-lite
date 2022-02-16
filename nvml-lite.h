@@ -70,6 +70,17 @@ typedef struct _nvmlUtilization {
     unsigned int memory; // Percent of time over the past sample period during which global (device) memory was being read or written.
 }nvmlUtilization_t;
 
+typedef struct _nvmlBAR1Memory {
+    unsigned long long  total; // Total installed FB memory (in bytes).
+    unsigned long long  free; // Unallocated FB memory (in bytes).
+    unsigned long long  used; // Allocated FB memory (in bytes). Note that the driver/GPU always sets aside a small amount of memory for bookkeeping.
+}nvmlBAR1Memory_t;
+
+typedef struct _nvmlMemory {
+    unsigned long long  total; // Total installed FB memory (in bytes).
+    unsigned long long  free; // Unallocated FB memory (in bytes).
+    unsigned long long  used; // Allocated FB memory (in bytes). Note that the driver/GPU always sets aside a small amount of memory for bookkeeping.
+}nvmlMemory_t;
 
 nvmlReturn_t (nvmlInit)();
 nvmlReturn_t (nvmlShutdown)();
@@ -81,6 +92,7 @@ nvmlReturn_t (nvmlDeviceGetPciInfo)(nvmlDevice_t device, nvmlPciInfo_t* pci);
 nvmlReturn_t (nvmlDeviceGetTemperatureThreshold)(nvmlDevice_t device, nvmlTemperatureThresholds_t thresholdType, unsigned int* temp);
 nvmlReturn_t (nvmlDeviceGetTemperature)(nvmlDevice_t device, nvmlTemperatureSensors_t sensorType, unsigned int* temp);
 nvmlReturn_t (nvmlDeviceGetUtilizationRates)(nvmlDevice_t device, nvmlUtilization_t* utilization);
-
+nvmlReturn_t nvmlDeviceGetMemoryInfo(nvmlDevice_t device, nvmlMemory_t* memory);
+nvmlReturn_t nvmlDeviceGetBAR1MemoryInfo(nvmlDevice_t device, nvmlBAR1Memory_t* bar1Memory);
 
 #endif

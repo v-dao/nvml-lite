@@ -13,6 +13,8 @@ typedef nvmlReturn_t(*nvmlDeviceGetPciInfoType)(nvmlDevice_t device, nvmlPciInfo
 typedef nvmlReturn_t(*nvmlDeviceGetTemperatureThresholdType)(nvmlDevice_t device, nvmlTemperatureThresholds_t thresholdType, unsigned int* temp);
 typedef nvmlReturn_t(*nvmlDeviceGetTemperatureType)(nvmlDevice_t device, nvmlTemperatureSensors_t sensorType, unsigned int* temp);
 typedef nvmlReturn_t(*nvmlDeviceGetUtilizationRatesType)(nvmlDevice_t device, nvmlUtilization_t* utilization);
+typedef nvmlReturn_t(*nvmlDeviceGetMemoryInfoType)(nvmlDevice_t device, nvmlMemory_t* memory);
+typedef nvmlReturn_t(*nvmlDeviceGetBAR1MemoryInfoType)(nvmlDevice_t device, nvmlBAR1Memory_t* bar1Memory);
 
 
 namespace {
@@ -27,6 +29,8 @@ namespace {
 	nvmlDeviceGetTemperatureThresholdType fnDeviceGetTemperatureThreshold = nullptr;
 	nvmlDeviceGetTemperatureType fnDeviceGetTemperature = nullptr;
 	nvmlDeviceGetUtilizationRatesType fnDeviceGetUtilizationRates = nullptr;
+	nvmlDeviceGetMemoryInfoType fnDeviceGetMemoryInfo = nullptr;
+	nvmlDeviceGetBAR1MemoryInfoType fnDeviceGetBAR1MemoryInfo = nullptr;
 }
 
 nvmlReturn_t nvmlInit()
@@ -60,6 +64,10 @@ nvmlReturn_t nvmlInit()
 		assert(fnDeviceGetTemperature);
 		fnDeviceGetUtilizationRates = (nvmlDeviceGetUtilizationRatesType)::GetProcAddress(m, "nvmlDeviceGetUtilizationRates");
 		assert(fnDeviceGetUtilizationRates);
+		fnDeviceGetMemoryInfo = (nvmlDeviceGetMemoryInfoType)::GetProcAddress(m, "nvmlDeviceGetMemoryInfo");
+		assert(fnDeviceGetMemoryInfo);
+		fnDeviceGetBAR1MemoryInfo = (nvmlDeviceGetBAR1MemoryInfoType)::GetProcAddress(m, "nvmlDeviceGetBAR1MemoryInfo");
+		assert(fnDeviceGetBAR1MemoryInfo);
 	}
 
 	return fnInit ? fnInit() : NVML_ERROR_UNKNOWN;
@@ -105,4 +113,14 @@ nvmlReturn_t nvmlDeviceGetTemperature(nvmlDevice_t device, nvmlTemperatureSensor
 nvmlReturn_t nvmlDeviceGetUtilizationRates(nvmlDevice_t device, nvmlUtilization_t* utilization)
 {
 	return fnDeviceGetUtilizationRates ? fnDeviceGetUtilizationRates(device, utilization) : NVML_ERROR_UNINITIALIZED;
+}
+
+nvmlReturn_t nvmlDeviceGetMemoryInfo(nvmlDevice_t device, nvmlMemory_t* memory)
+{
+	return fnDeviceGetMemoryInfo ? fnDeviceGetMemoryInfo(device, memory) : NVML_ERROR_UNINITIALIZED;
+}
+
+nvmlReturn_t nvmlDeviceGetBAR1MemoryInfo(nvmlDevice_t device, nvmlBAR1Memory_t* bar1Memory)
+{
+	return fnDeviceGetBAR1MemoryInfo ? fnDeviceGetBAR1MemoryInfo(device, bar1Memory) : NVML_ERROR_UNINITIALIZED;
 }
